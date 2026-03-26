@@ -7,90 +7,90 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: ProfilePage());
+    return MaterialApp(
+      title: 'Giới thiệu nhóm',
+      debugShowCheckedModeBanner: false,
+      home: ProfilePage(),
+    );
   }
 }
 
 class ProfilePage extends StatelessWidget {
+
+  final List<Map<String, String>> members = [
+    {
+      "name": "Quách Văn An",
+      "role": "Trưởng nhóm",
+      "birth": "2004",
+      "hometown": "Phú Thọ",
+      "image": "https://i.postimg.cc/6530LGyf/deptrai.jpg"
+    },
+    {
+      "name": "Quach Chân Chính",
+      "role": "Thành viên",
+      "birth": "2002",
+      "hometown": "Phú Thọ",
+      "image": "https://i.postimg.cc/1RLG6Y1y/stingg.jpg" // thêm link sau
+    },
+    {
+      "name": "Nguyên Quốc Vương",
+      "role": "Thành viên",
+      "birth": "2004",
+      "hometown": "Phú Thọ",
+      "image": "https://i.postimg.cc/kGs3KRYB/vuon.jpg"
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blueAccent, Colors.lightBlue],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Center(
-          child: Container(
-            width: width > 600 ? 400 : width * 0.9, // responsive
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Avatar
-                CircleAvatar(
-                  radius: width > 600 ? 70 : 50,
-                  backgroundImage: NetworkImage(
-                    'https://i.imgur.com/BoN9kdC.png',
+      appBar: AppBar(
+        title: Text("Giới thiệu nhóm"),
+        centerTitle: true,
+      ),
+      body: ListView.builder(
+        itemCount: members.length,
+        itemBuilder: (context, index) {
+          final member = members[index];
+
+          return Card(
+            margin: EdgeInsets.all(15),
+            elevation: 5,
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: member["image"]!.isNotEmpty
+                        ? NetworkImage(member["image"]!)
+                        : null,
+                    child: member["image"]!.isEmpty
+                        ? Icon(Icons.person, size: 40)
+                        : null,
                   ),
-                ),
-
-                SizedBox(height: 20),
-
-                // Name
-                Text(
-                  'Quách Chân Chính',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: width > 600 ? 28 : 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                SizedBox(height: 10),
-
-                // MSV
-                Text(
-                  'MSV: 20220489',
-                  style: TextStyle(fontSize: width > 600 ? 20 : 16),
-                ),
-
-                SizedBox(height: 10),
-
-                // Role
-                Text(
-                  'Chức vụ: Thành viên',
-                  style: TextStyle(fontSize: width > 600 ? 20 : 16),
-                ),
-
-                SizedBox(height: 20),
-
-                Divider(),
-
-                SizedBox(height: 10),
-
-                // Button demo
-                ElevatedButton(onPressed: () {}, child: Text('Liên hệ')),
-              ],
+                  SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        member["name"]!,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text("Chức vụ: ${member["role"]}"),
+                      Text("Năm sinh: ${member["birth"]}"),
+                      Text("Quê quán: ${member["hometown"]}"),
+                    ],
+                  )
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
