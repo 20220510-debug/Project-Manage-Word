@@ -1,0 +1,108 @@
+<mxfile host="app.diagrams.net">
+<diagram name="PMW ERD">
+<mxGraphModel dx="1200" dy="800" grid="1" gridSize="10">
+<root>
+<mxCell id="0"/><mxCell id="1" parent="0"/>
+
+<!-- USER -->
+<mxCell value="USER
+- id (PK)
+- name
+- phone
+- role
+- department_id (FK)
+- team_id (FK)" style="rounded=1;fillColor=#e3f2fd" vertex="1" parent="1">
+<mxGeometry x="50" y="50" width="200" height="140"/>
+</mxCell>
+
+<!-- DEPARTMENT -->
+<mxCell value="DEPARTMENT
+- id (PK)
+- name" style="rounded=1;fillColor=#fff3e0" vertex="1" parent="1">
+<mxGeometry x="50" y="220" width="200" height="100"/>
+</mxCell>
+
+<!-- TEAM -->
+<mxCell value="TEAM
+- id (PK)
+- name
+- department_id (FK)" style="rounded=1;fillColor=#fff3e0" vertex="1" parent="1">
+<mxGeometry x="50" y="350" width="200" height="120"/>
+</mxCell>
+
+<!-- CUSTOMER -->
+<mxCell value="CUSTOMER
+- id (PK)
+- name
+- phone
+- source
+- assigned_to (FK USER)" style="rounded=1;fillColor=#e8f5e9" vertex="1" parent="1">
+<mxGeometry x="300" y="50" width="220" height="140"/>
+</mxCell>
+
+<!-- TASK -->
+<mxCell value="TASK
+- id (PK)
+- customer_id (FK)
+- name
+- status
+- total_amount
+- material_main
+- material_sub
+- profit
+- deadline" style="rounded=1;fillColor=#fce4ec" vertex="1" parent="1">
+<mxGeometry x="300" y="220" width="240" height="180"/>
+</mxCell>
+
+<!-- ASSIGNMENT -->
+<mxCell value="ASSIGNMENT
+- id (PK)
+- task_id (FK)
+- user_id (FK)
+- role (sale/mkt/supervisor/source)" style="rounded=1;fillColor=#ede7f6" vertex="1" parent="1">
+<mxGeometry x="300" y="420" width="240" height="140"/>
+</mxCell>
+
+<!-- TRANSACTION -->
+<mxCell value="TRANSACTION
+- id (PK)
+- task_id (FK)
+- amount
+- date" style="rounded=1;fillColor=#e0f7fa" vertex="1" parent="1">
+<mxGeometry x="600" y="220" width="220" height="120"/>
+</mxCell>
+
+<!-- COMMISSION -->
+<mxCell value="COMMISSION
+- id (PK)
+- task_id (FK)
+- user_id (FK)
+- role
+- percent
+- amount" style="rounded=1;fillColor=#fffde7" vertex="1" parent="1">
+<mxGeometry x="600" y="380" width="220" height="140"/>
+</mxCell>
+
+<!-- CHECKIN -->
+<mxCell value="CHECKIN
+- id (PK)
+- user_id (FK)
+- checkin_time
+- checkout_time
+- status" style="rounded=1;fillColor=#f1f8e9" vertex="1" parent="1">
+<mxGeometry x="850" y="50" width="220" height="140"/>
+</mxCell>
+
+<!-- RELATION LINES -->
+<mxCell edge="1" source="2" target="3" parent="1"/>
+<mxCell edge="1" source="3" target="4" parent="1"/>
+<mxCell edge="1" source="4" target="5" parent="1"/>
+<mxCell edge="1" source="5" target="6" parent="1"/>
+<mxCell edge="1" source="5" target="7" parent="1"/>
+<mxCell edge="1" source="5" target="8" parent="1"/>
+<mxCell edge="1" source="2" target="9" parent="1"/>
+
+</root>
+</mxGraphModel>
+</diagram>
+</mxfile>
