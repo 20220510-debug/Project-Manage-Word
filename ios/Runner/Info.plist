@@ -7,7 +7,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
+<<<<<<< HEAD
 	<string>Quanlycongviechoahong</string>
+=======
+	<string>Project Mw App</string>
+>>>>>>> c3c1a49ca754c2918e37ef0656da26878b7d140d
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +19,11 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
+<<<<<<< HEAD
 	<string>quanlycongviechoahong</string>
+=======
+	<string>project_mw_app</string>
+>>>>>>> c3c1a49ca754c2918e37ef0656da26878b7d140d
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

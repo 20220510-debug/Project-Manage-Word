@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # quanlycongviechoahong
 
 A new Flutter project.
@@ -15,3 +16,10 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+
+# Project nhóm
+App Flutter quản lý...
+
+
+>>>>>>> c3c1a49ca754c2918e37ef0656da26878b7d140d
