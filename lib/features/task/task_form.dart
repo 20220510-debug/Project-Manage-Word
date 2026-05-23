@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+
 import '../../models/task_model.dart';
-import '../../services/firebase_service.dart';
 
 class TaskForm extends StatefulWidget {
   final TaskModel? taskToEdit;
@@ -44,6 +43,7 @@ class _TaskFormState extends State<TaskForm> {
       appBar: AppBar(
         title: Text(isEditing ? 'Sửa Công Việc' : 'Tạo Công Việc Mới'),
         backgroundColor: Colors.blue[800],
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -89,62 +89,49 @@ class _TaskFormState extends State<TaskForm> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    try {
-                      final service = Provider.of<FirebaseService>(context, listen: false);
-                      final customerName = _customerNameController.text.trim();
-
-                      // Tạo / cập nhật khách hàng
-                      await FirebaseFirestore.instance.collection('customers').doc(customerName).set({
-                        'name': customerName,
-                        'phone': _phoneController.text,
-                        'status': _selectedStatus.name,
-                        'lastUpdated': Timestamp.now(),
-                      }, SetOptions(merge: true));
-
-                      // Tạo công việc
-                      final newTask = TaskModel(
-                        id: widget.taskToEdit?.id ?? '',
-                        title: _titleController.text,
-                        customerId: customerName,
-                        customerName: customerName,
-                        status: _selectedStatus,
-                        deadline: _deadline,
-                        createdAt: DateTime.now(),
-                        totalRevenue: double.tryParse(_revenueController.text) ?? 0,
-                        mainMaterialCost: 0,
-                        subMaterialCost: 0,
-                        participants: {},
-                      );
-
-                      if (widget.taskToEdit != null) {
-                        await FirebaseFirestore.instance.collection('tasks').doc(newTask.id).update(newTask.toMap());
-                      } else {
-                        await service.addTask(newTask);
-                      }
-
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('✅ Thành công!'), backgroundColor: Colors.green),
-                        );
-                        Navigator.pop(context);
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
-                        );
-                      }
-                    }
-                  }
-                },
-                child: Text(widget.taskToEdit != null ? 'CẬP NHẬT' : 'TẠO CÔNG VIỆC'),
+                onPressed: _saveTask,
+                child: Text(isEditing ? 'CẬP NHẬT' : 'TẠO CÔNG VIỆC'),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _saveTask() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      final newTask = TaskModel(
+        id: widget.taskToEdit?.id ?? '',
+        title: _titleController.text.trim(),
+        customerId: _customerNameController.text.trim(),
+        customerName: _customerNameController.text.trim(),
+        status: _selectedStatus,
+        deadline: _deadline,
+        createdAt: DateTime.now(),
+        totalRevenue: double.tryParse(_revenueController.text) ?? 0,
+      );
+
+      if (widget.taskToEdit != null) {
+        await FirebaseFirestore.instance.collection('tasks').doc(newTask.id).update(newTask.toMap());
+      } else {
+        await FirebaseFirestore.instance.collection('tasks').add(newTask.toMap());
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Thành công!'), backgroundColor: Colors.green),
+        );
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('❌ Lỗi: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 }

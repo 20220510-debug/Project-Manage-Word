@@ -1,36 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum UserRole {
-  admin,
-  truongphong,
-  teamlead,
-  nvkd,
-  marketing,
-  giamsat,
-  nguonkhach,
+  admin("Quản trị viên"),
+  staff("Nhân viên"),
+  manager("Quản lý");
+
+  final String name;
+  const UserRole(this.name);
 }
 
 class UserModel {
   final String uid;
   final String name;
   final String email;
-  final String phone;
-  final String phong;
-  final String team;
   final UserRole role;
-  final double luongCoBan;
-  final DateTime ngayVaoLam;
+  final String? phone;
+  final String? phong;
+  final String? team;
+  final DateTime? ngayVaoLam;
+  final DateTime createdAt;
 
   UserModel({
     required this.uid,
     required this.name,
     required this.email,
-    required this.phone,
-    required this.phong,
-    required this.team,
     required this.role,
-    this.luongCoBan = 0.0,
-    required this.ngayVaoLam,
+    this.phone,
+    this.phong,
+    this.team,
+    this.ngayVaoLam,
+    required this.createdAt,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map, String uid) {
@@ -38,12 +37,15 @@ class UserModel {
       uid: uid,
       name: map['name'] ?? '',
       email: map['email'] ?? '',
-      phone: map['phone'] ?? '',
-      phong: map['phong'] ?? '',
-      team: map['team'] ?? '',
-      role: UserRole.values.byName(map['role'] ?? 'nvkd'),
-      luongCoBan: (map['luongCoBan'] ?? 0.0).toDouble(),
-      ngayVaoLam: (map['ngayVaoLam'] as Timestamp).toDate(),
+      role: UserRole.values.firstWhere(
+            (e) => e.name == map['role'],
+        orElse: () => UserRole.staff,
+      ),
+      phone: map['phone'],
+      phong: map['phong'],
+      team: map['team'],
+      ngayVaoLam: map['ngayVaoLam'] != null ? (map['ngayVaoLam'] as Timestamp).toDate() : null,
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
     );
   }
 
@@ -51,12 +53,12 @@ class UserModel {
     return {
       'name': name,
       'email': email,
+      'role': role.name,
       'phone': phone,
       'phong': phong,
       'team': team,
-      'role': role.name,
-      'luongCoBan': luongCoBan,
-      'ngayVaoLam': ngayVaoLam,
+      'ngayVaoLam': ngayVaoLam != null ? Timestamp.fromDate(ngayVaoLam!) : null,
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 }

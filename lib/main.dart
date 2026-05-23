@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-<<<<<<< HEAD
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
 import 'services/firebase_service.dart';
-import 'core/widgets/main_layout.dart';
+import 'features/auth/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,13 +13,11 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  } catch (e) {}
+    debugPrint("✅ Firebase initialized successfully");
+  } catch (e) {
+    debugPrint("❌ Firebase init error: $e");
+  }
 
-=======
-import 'screens/dashboard_screen.dart';
-
-void main() {
->>>>>>> c3c1a49ca754c2918e37ef0656da26878b7d140d
   runApp(const MyApp());
 }
 
@@ -28,29 +26,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    return MultiProvider(
-      providers: [
-        Provider<FirebaseService>(create: (_) => FirebaseService()),
-      ],
+    return ChangeNotifierProvider<FirebaseService>(
+      create: (_) => FirebaseService(),
       child: MaterialApp(
         title: 'PMW - Quản Lý Công Việc & Hoa Hồng',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-        home: const MainLayout(),
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          useMaterial3: true,
+        ),
+        home: const LoginScreen(),
         locale: const Locale('vi', 'VN'),
       ),
-=======
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'PMW App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      ),
-
-      // 👇 QUAN TRỌNG NHẤT
-      home: DashboardScreen(),
->>>>>>> c3c1a49ca754c2918e37ef0656da26878b7d140d
     );
   }
 }

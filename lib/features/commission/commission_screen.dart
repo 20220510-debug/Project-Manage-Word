@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../models/task_model.dart';
+import 'package:flutter/material.dart';
+import '/models/task_model.dart';
 
 class CommissionScreen extends StatefulWidget {
   const CommissionScreen({super.key});
@@ -32,6 +32,8 @@ class _CommissionScreenState extends State<CommissionScreen> {
                 hintText: 'Tìm kiếm công việc...',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                filled: true,
+                fillColor: Colors.grey[100],
               ),
               onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
             ),
@@ -47,18 +49,16 @@ class _CommissionScreenState extends State<CommissionScreen> {
                   return const Center(child: Text('Chưa có dữ liệu hoa hồng'));
                 }
 
-                var tasks = snapshot.data!.docs.map((doc) {
-                  return TaskModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-                }).toList();
+                var tasks = snapshot.data!.docs
+                    .map((doc) => TaskModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+                    .toList();
 
-                // Lọc theo search
                 if (_searchQuery.isNotEmpty) {
                   tasks = tasks.where((t) =>
                   t.title.toLowerCase().contains(_searchQuery) ||
                       t.customerName.toLowerCase().contains(_searchQuery)).toList();
                 }
 
-                // Lọc theo trạng thái
                 if (_filterStatus != 'Tất cả') {
                   tasks = tasks.where((t) => t.status.name == _filterStatus).toList();
                 }
@@ -78,11 +78,12 @@ class _CommissionScreenState extends State<CommissionScreen> {
 
   Widget _buildCommissionCard(TaskModel task) {
     final revenue = task.totalRevenue;
-    final profit = revenue - task.mainMaterialCost - task.subMaterialCost;
+    final cost = task.mainMaterialCost + task.subMaterialCost;
+    final profit = revenue - cost;
 
-    final nvkd = (revenue * 0.02).round();           // 2% NVKD
-    final marketing = (revenue * 0.02).round();      // 2% Marketing
-    final giamSat = (profit * 0.07).round();         // 7% Giám sát
+    final nvkd = (revenue * 0.02).round();      // 2% NVKD
+    final marketing = (revenue * 0.02).round(); // 2% Marketing
+    final giamSat = (profit * 0.07).round();    // 7% Giám sát
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -102,7 +103,6 @@ class _CommissionScreenState extends State<CommissionScreen> {
             ),
             Text('Khách: ${task.customerName}', style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 12),
-
             const Divider(),
             const SizedBox(height: 8),
 
@@ -110,7 +110,8 @@ class _CommissionScreenState extends State<CommissionScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Doanh thu:', style: TextStyle(fontWeight: FontWeight.w500)),
-                Text('${revenue ~/ 1000000} triệu', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('${(revenue / 1000000).toStringAsFixed(2)} triệu',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 12),
@@ -122,7 +123,8 @@ class _CommissionScreenState extends State<CommissionScreen> {
             if (profit > 0)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text('Lợi nhuận: ${profit ~/ 1000000} triệu', style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                child: Text('Lợi nhuận: ${(profit / 1000000).toStringAsFixed(2)} triệu',
+                    style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ),
           ],
         ),
@@ -136,8 +138,8 @@ class _CommissionScreenState extends State<CommissionScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 14)),
-          Text('${amount}đ', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
+          Text(title),
+          Text('${amount.toString()}đ', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );

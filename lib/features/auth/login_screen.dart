@@ -1,111 +1,126 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '/models/user_model.dart';
-import '/models/task_model.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class FirebaseService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+import '../../services/firebase_service.dart';
+import 'register_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
-  UserModel? _currentUser;
-  UserModel? get currentUser => _currentUser;
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
-  // ====================== AUTH ======================
-  Future<User?> login(String email, String password) async {
-    try {
-      UserCredential credential = await _auth.signInWithEmailAndPassword(
-          email: email,
-          password: password
-      );
-      await _loadCurrentUser(credential.user!.uid);
-      return credential.user;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
-  Future<User?> register(String email, String password) async {
-    try {
-      UserCredential credential = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password
-      );
-      await _loadCurrentUser(credential.user!.uid);
-      return credential.user;
-    } catch (e) {
-      rethrow;
-    }
-  }
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  Future<void> _loadCurrentUser(String uid) async {
-    try {
-      final doc = await _firestore.collection('users').doc(uid).get();
-      if (doc.exists) {
-        _currentUser = UserModel.fromMap(doc.data()!, uid);
-      }
-    } catch (e) {
-      print("Lỗi load user: $e");
-    }
-  }
+  bool _isLoading = false;
+  bool _obscurePassword = true;   // Khởi tạo rõ ràng
 
-  // ====================== TASK ======================
-  Future<String> addTask(TaskModel task) async {
-    try {
-      DocumentReference doc = await _firestore.collection('tasks').add(task.toMap());
-      return doc.id;
-    } catch (e) {
-      rethrow;
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.work, size: 90, color: Colors.blue),
+              const SizedBox(height: 16),
+              const Text(
+                "PMW",
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+              ),
+              const Text(
+                "Quản Lý Công Việc & Hoa Hồng",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 60),
 
-  Future<void> updateTask(String taskId, TaskModel task) async {
-    try {
-      await _firestore.collection('tasks').doc(taskId).update(task.toMap());
-    } catch (e) {
-      rethrow;
-    }
-  }
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email_outlined),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
 
-  Future<void> deleteTask(String taskId) async {
-    try {
-      await _firestore.collection('tasks').doc(taskId).delete();
-    } catch (e) {
-      rethrow;
-    }
-  }
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  labelText: "Mật khẩu",
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock_outlined),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
 
-  // ====================== USER ======================
-  Future<void> createUser(UserModel user) async {
-    await _firestore.collection('users').doc(user.uid).set(user.toMap());
-  }
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : () async {
+                    setState(() => _isLoading = true);
 
-  Future<void> createDefaultAdmin() async {
-    try {
-      final adminDoc = await _firestore.collection('users').doc('admin_default').get();
-      if (adminDoc.exists) return;
+                    final user = await Provider.of<FirebaseService>(context, listen: false).login(
+                      _emailController.text.trim(),
+                      _passwordController.text.trim(),
+                    );
 
-      UserCredential credential = await _auth.createUserWithEmailAndPassword(
-        email: "admin@quanly.com",
-        password: "12345678",
-      );
+                    if (user != null && mounted) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                      );
+                    } else if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Sai email hoặc mật khẩu'), backgroundColor: Colors.red),
+                      );
+                    }
 
-      final user = credential.user!;
-      final adminUser = UserModel(
-        uid: user.uid,
-        name: "Administrator",
-        email: "admin@quanly.com",
-        phone: "0987654321",
-        phong: "Ban Giám Đốc",
-        team: "Admin",
-        role: UserRole.admin,
-        luongCoBan: 15000000,
-        ngayVaoLam: DateTime.now(),
-      );
+                    if (mounted) setState(() => _isLoading = false);
+                  },
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("ĐĂNG NHẬP", style: TextStyle(fontSize: 16)),
+                ),
+              ),
 
-      await createUser(adminUser);
-      print("✅ Admin created: admin@quanly.com / 12345678");
-    } catch (e) {
-      print("Admin exists: $e");
-    }
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    );
+                  },
+                  child: const Text("CHƯA CÓ TÀI KHOẢN? ĐĂNG KÝ"),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
