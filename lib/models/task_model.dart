@@ -1,17 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum TaskStatus {
-  tiepNhan("Tiếp nhận"),
-  daGoiTuVan("Đã gọi tư vấn"),
-  guiBaoGia("Gửi báo giá"),
-  chotHopDong("Chốt hợp đồng"),
-  daChuyenHang("Đã chuyển hàng"),
-  dangThiCong("Đang thi công"),
-  daNghiemThu("Đã nghiệm thu"),
-  hoanThanh("Hoàn thành");
-
-  final String name;
-  const TaskStatus(this.name);
+  tiepNhan,
+  daGoiTuVan,
+  guiBaoGia,
+  chotHopDong,
+  daChuyenHang,
+  dangThiCong,
+  daNghiemThu,
+  hoanThanh,
 }
 
 class TaskModel {
@@ -25,7 +22,8 @@ class TaskModel {
   final double totalRevenue;
   final double mainMaterialCost;
   final double subMaterialCost;
-  final Map<String, dynamic> participants;   // ai tham gia
+  final Map<String, dynamic> participants;
+  final String source;   // ← ĐÃ THÊM
 
   TaskModel({
     required this.id,
@@ -39,6 +37,7 @@ class TaskModel {
     this.mainMaterialCost = 0,
     this.subMaterialCost = 0,
     this.participants = const {},
+    this.source = 'Facebook',   // ← ĐÃ THÊM
   });
 
   factory TaskModel.fromMap(Map<String, dynamic> map, String id) {
@@ -56,7 +55,8 @@ class TaskModel {
       totalRevenue: (map['totalRevenue'] ?? 0).toDouble(),
       mainMaterialCost: (map['mainMaterialCost'] ?? 0).toDouble(),
       subMaterialCost: (map['subMaterialCost'] ?? 0).toDouble(),
-      participants: map['participants'] ?? {},
+      participants: Map<String, dynamic>.from(map['participants'] ?? {}),
+      source: map['source'] ?? 'Facebook',   // ← ĐÃ THÊM
     );
   }
 
@@ -72,6 +72,7 @@ class TaskModel {
       'mainMaterialCost': mainMaterialCost,
       'subMaterialCost': subMaterialCost,
       'participants': participants,
+      'source': source,   // ← ĐÃ THÊM
     };
   }
 }
